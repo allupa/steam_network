@@ -4,10 +4,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+import xml.etree.ElementTree as ET
 import time
 import csv
 import re
-import json
+import util
+
 
 # Remove double spaces, whitespaces and change everything to uppercase from ski data
 def clean_ski(l):
@@ -21,7 +23,7 @@ def clean_ski(l):
 # Initialize chrome webdriver
 def get_chrome_driver(config):
     options = Options()
-    # options.add_argument("--headless")
+    #options.add_argument("--headless")
     options.add_argument("--start-maximized")
     options.add_argument("--incognito")
     exec_path = config['chrome-webdriver']['windows']
@@ -35,14 +37,8 @@ def write_to_csv(lines):
         writer.writerows(lines)
 
 
-def load_config():
-    with open('config.json', 'r') as f:
-        config = json.load(f)
-        return config
-
-
 def main():
-    config = load_config()
+    config = util.load_config()
     driver = get_chrome_driver(config)
     # Open reviews and pick first review to start crawling
     driver.get("https://steamcommunity.com/?subsection=reviews")
@@ -53,7 +49,11 @@ def main():
     driver.find_element_by_class_name("apphub_Card").click()
     element = driver.find_element_by_xpath("//a[contains(@href, 'steamcommunity.com/id')]")
     profile_link = element.text.split('/')[4]
-    driver.get(f'https://steamcommunity.com/id/{profile_link}')
+    driver.get(f'https://steamcommunity.com/id/{profile_link}?xml=1')
+    root = ET.fromstring(driver.page_source)
+    for i in root.iter('steamID64'):
+        steamID64 = i.text
+    print(steamID64)
     time.sleep(10)
 
     # Close everything
