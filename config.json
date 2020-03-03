@@ -1,0 +1,5 @@
+{
+  "chrome-webdriver" : {
+    "windows" : "chromedriver.exe"
+  }
+}
