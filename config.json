@@ -1,5 +1,8 @@
 {
   "chrome-webdriver" : {
     "windows" : "chromedriver.exe"
+  },
+  "steam_api_key" : {
+    "key" : "steam_api_key.csv"
   }
 }
