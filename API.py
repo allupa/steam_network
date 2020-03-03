@@ -3,17 +3,16 @@ Koodissa haetaan Steam Web APIn kautta k채ytt채jien steamID:t ja heid채n k채ytt�
 '''
 
 import pandas as pd
-import urllib
 import requests
-import json
-
+import util
 
 steamIDs = []
 myFriends = []
 steam_nick_id = {}
 
 #API-key:n haku ja sijoittaminen
-api_key = pd.read_csv('steam_api_key.csv', header=None, skipinitialspace=True)
+config = util.load_config()
+api_key = pd.read_csv(config['steam_api_key']['key'], header=None, skipinitialspace=True)
 steam_api_key = api_key[1][0]
 
 #T채ll채 hetkell채 testi id (nicon)
@@ -41,3 +40,4 @@ for placeholder in range(len(steamIDs)):
     i += 1
 
 steam_nick_id = dict(zip(myFriends, steamIDs))
+print(steam_nick_id)
