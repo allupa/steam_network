@@ -44,8 +44,10 @@ def main():
             from_to = [n for n in gameIDs]
             for node in from_to:
                 steam_data.append([int(steamid), node])
-            
-
+            '''
+            OBS! Not sure if this works in gephi, as it saves game names (str). If 'name' from row 42 changed to
+            'appid' it gives a int, which works with gephi
+            '''
         except KeyError:
             print("Failed request, KeyError")
             continue
