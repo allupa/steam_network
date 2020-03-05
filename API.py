@@ -25,8 +25,8 @@ steamid = 76561198058128631
 
 #Web API osoitteet, joista voidaan hakea tietoa
 api_baseurl = 'http://api.steampowered.com/ISteamUser'
-api_getfriends = api_baseurl + '/GetFriendList/v0001/?key={}&steamid={}&relationship=all'.format(steam_api_key, steamid)
-api_getplayersummaries = api_baseurl + '/GetPlayerSummaries/v0002/?key={}&steamids='.format(steam_api_key)
+api_getfriends = api_baseurl + '/GetFriendList/v0001/?key={}&steamid={}&relationship=all'.format(api_key, steamid)
+api_getplayersummaries = api_baseurl + '/GetPlayerSummaries/v0002/?key={}&steamids='.format(api_key)
 
 #Haetaan webistä steamID:n käyttäjän kaverit listaan steamIDs
 r = requests.get(api_getfriends)
