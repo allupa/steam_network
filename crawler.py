@@ -24,7 +24,7 @@ def clean_ski(l):
 # Initialize chrome webdriver
 def get_chrome_driver(config):
     options = Options()
-    options.add_argument("--headless")
+    #options.add_argument("--headless")
     options.add_argument("--start-maximized")
     options.add_argument("--incognito")
     exec_path = config['chrome-webdriver']['windows']

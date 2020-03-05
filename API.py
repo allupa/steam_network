@@ -5,6 +5,7 @@ Koodissa haetaan Steam Web APIn kautta k채ytt채jien steamID:t ja heid채n k채ytt�
 import pandas as pd
 import requests
 import util
+import json
 
 steamIDs = []
 myFriends = []
@@ -12,8 +13,12 @@ steam_nick_id = {}
 
 #API-key:n haku ja sijoittaminen
 config = util.load_config()
-api_key = pd.read_csv(config['steam_api_key']['key'], header=None, skipinitialspace=True)
-steam_api_key = api_key[1][0]
+with open(config["steam_ids"]["results"], 'r') as f:
+    results_json = json.load(f)
+    keys = [n for n in results_json.keys()]
+    steam_ids = results_json[keys[0]] 
+    print(f'Steam ids: {steam_ids}')
+api_key = config['steam_api_key']['key']
 
 #T채ll채 hetkell채 testi id (nicon)
 steamid = 76561198058128631

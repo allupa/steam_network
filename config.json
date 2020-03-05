@@ -3,6 +3,9 @@
     "windows" : "chromedriver.exe"
   },
   "steam_api_key" : {
-    "key" : "steam_api_key.csv"
+    "key" : "E0F8FA82090FB12EA3161647A8D1A152"
+  },
+  "steam_ids" : {
+    "results" : "results.json"
   }
 }
