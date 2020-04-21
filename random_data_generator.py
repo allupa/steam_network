@@ -37,11 +37,20 @@ def random_BA_network(N, m_0, m):
     return G
 
 
+
 G = random_ER_network(N, avg_k=2.212)
 nx.write_gexf(G, 'random_ER.gexf')
 
 '''
 Arvot tähän alempaan heitetty päästä, tuli ainakin oikean kokoluokan nro of edges m = 1 arvolla
+m_0 on ensimmäisen noden yhteydet ja m on jälkimmäisten nodejen yhteydet, yksinkertaistettuna
 '''
 G = random_BA_network(N, m_0=10, m=1)
 nx.write_gexf(G, 'random_BA.gexf')
+
+'''
+Paljon tunkkausta, näillä ihan hyvä. Arvot: N nodet, klusterin keskiarvokoko, klustereiden määrä, klustereiden sisäisten linkkien todnäk,
+klustereiden välisten linkkien todnäk, hieman yksinkertaistettuna
+'''
+G = nx.generators.community.gaussian_random_partition_graph(N, 750, 8, 0.0015, 0.000005)
+nx.write_gexf(G, 'random_gauss.gexf')
