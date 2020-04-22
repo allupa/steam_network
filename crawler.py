@@ -78,7 +78,9 @@ def main():
     print("Writing to csv...")
     data[steamID64] = crawl_friends(profile_link, driver)
     write_to_json(data)
-    crawl_review_score(profile_link, driver)
+    # Two examples of score crawling
+    crawl_review_score(profile_link, driver, steamID64)
+    crawl_review_score("76561198004307871", driver, "76561198004307871")
     time.sleep(10)
     # Close everything
     driver.quit()
