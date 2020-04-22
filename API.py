@@ -53,28 +53,30 @@ def main():
             from_to = [n for n in steamIDs]
             for node in from_to:
                 steam_data.append([int(i), int(node)])
-            r = requests.get(api_getplayersummaries)
-            data = r.json()
+            req = requests.get(api_getplayersummaries)
+            data = req.json()
             persona_name = data['response']['players'][0]['personaname']
             crawl_review_score(persona_name, driver, i)
             for n in from_to:
-                api_getfriends = api_baseurl + '/GetFriendList/v0001/?key={}&steamid={}&relationship=all'.format(api_key, n)
-                r = requests.get(api_getfriends)
-                data2 = r.json()
+                api_getfriends2 = api_baseurl + '/GetFriendList/v0001/?key={}&steamid={}&relationship=all'.format(api_key, n)
+                r2 = requests.get(api_getfriends2)
+                data2 = r2.json()
+                print(data2)
                 friend_nodes2 = [s for s in data2['friendslist']['friends']]
                 steamIDs2 = [n['steamid'] for n in friend_nodes2]
                 from_to2 = [n for n in steamIDs2]
                 for node in from_to2:
                     steam_data.append([int(n), int(node)])
-                r = requests.get(api_getplayersummaries)
-                data = r.json()
-                persona_name = data['response']['players'][0]['personaname']
+                r3 = requests.get(api_getplayersummaries)
+                data3 = r3.json()
+                persona_name = data3['response']['players'][0]['personaname']
                 crawl_review_score(persona_name, driver, n)
 
 
 
-        except KeyError:
-            print("Failed request, KeyError")
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            print(exc_type, exc_tb.tb_lineno)
             continue
         # except:
         #     print("Unexpected error:", sys.exc_info()[0])
