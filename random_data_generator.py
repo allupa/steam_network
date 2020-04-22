@@ -12,11 +12,11 @@ from collections import Counter
 import pandas as pd
 
 #Crawled data
-G_crawled = nx.read_edgelist('network.csv')
-G_crawled.graph['pos'] = nx.spring_layout(G_crawled)
+#G_crawled = nx.read_edgelist('network.csv')
+#G_crawled.graph['pos'] = nx.spring_layout(G_crawled)
 
-#N = 5989
-N = 500
+N = 5989
+#N = 500
 p = 0
 avg_k = 2.212
 
@@ -39,10 +39,10 @@ def random_BA_network(N, m_0, m):
             G.add_edge(i, target)
     return G
 
+
 #Creating random network - ER
 G_ER = random_ER_network(N, avg_k)
-nx.write_gexf(G_ER, 'random_ER.gexf')
-
+#nx.write_gexf(G_ER, 'random_ER.gexf')
 '''
 Arvot tähän alempaan heitetty päästä, tuli ainakin oikean kokoluokan nro of edges m = 1 arvolla
 m_0 on ensimmäisen noden yhteydet ja m on jälkimmäisten nodejen yhteydet, yksinkertaistettuna
@@ -78,7 +78,7 @@ def infect_node(G, n=1):
     for i_0 in infect_list:
         G.nodes[i_0]['Infected'] = True
         G.nodes[i_0]['Infection time'] = G.graph['t']
-    #return G - poista kommentti, jos haluat gexf
+    return G  #- poista kommentti, jos haluat gexf
 
 def plot(G, title=None):
     color = ['r' if G.nodes[node]['Infected'] else 'g' for node in G.nodes()]
@@ -93,9 +93,9 @@ infect_node(G_gaussian, 2)
 plot(G_crawled)
 '''
 
+G_ER_inf = infect_node(G_ER, n=2)
 '''
 #Tällä saat kirjoitettua halutuista tiedostoista gexf muotoisen, jolloin ne soveltuvat gephiin ja siellä näkee tartunnat. Poista kommentti functiosta infect_node
-G_ER_inf = infect_node(G_ER, n=2)
 G_BA_inf = infect_node(G_BA, n=2)
 G_gaussian_inf = infect_node(G_gaussian, n=2)
 G_crawled_inf = infect_node(G_crawled, n=2)
@@ -107,14 +107,52 @@ nx.write_gexf(G_crawled_inf, 'crawled_inf.gexf')
 
 #Infektion loppuvaiheen mallinnus
 def spread(G, p):
-    nx.set_node_attributes(G, {
-        node: True if t == 0 else False
-        for node, t in nx.get_node_attributes(G, 'Infection_time').iteritems()},
-        'Infected')
+    nx.set_node_attributes(G,
+                            {node: True if t == 0 else False
+                            for node, t in nx.get_node_attributes(G, 'Infection_time').items()},
+                            'Infected')
     G.graph['t'] = 0
     while True:
         propagate = False
         G.graph['t'] += 1
         infected = [node for node in G.nodes() if G.nodes[node]['Infected']]
         for node in infected:
-            
+            susceptible_neighbors = [sn for sn in G.neighbors(node) if not G.nodes[sn]['Infected']]
+            propagate += len(susceptible_neighbors) > 0
+            for sn in susceptible_neighbors:
+                if np.random.random_sample() < p:
+                    G.nodes[sn]['Infected'] = True
+                    G.nodes[sn]['Infection_time'] = G.graph['t']
+        if not propagate:
+            break
+    infection_times = nx.get_node_attributes(G, 'Infection_time')
+    it_counter = Counter(infection_times.values())
+    return it_counter
+
+
+#Kuvaajan piirtoa
+it_counter = spread(G_ER_inf, p=0.01)
+plot(G_ER_inf)
+
+#Yhden datasetin kuvaajan piirtoa
+it = pd.Series(it_counter)
+it.sort_index().cumsum().plot(logy=False, marker='.')
+plt.xlabel(r'$t$', fontsize=16)
+plt.ylabel(r'$I(t)$', fontsize=16)
+plt.title('t={}'.format(G_ER_inf.graph['t']))
+plt.show()
+
+#Monen datasetin keskiarvoa
+counter = Counter()
+for b in range(20):
+    counter += spread(G_ER_inf, p=0.05)
+total = sum(counter.values())
+for key in counter:
+    counter[key] /= float(total)
+it = pd.Series(counter)
+it.sort_index().cumsum().plot(logy=False, marker='.')
+plt.title('ER Infection Peak')
+plt.xlabel(r'$t$', fontsize=16)
+plt.ylabel(r'$I(t)$', fontsize=16)
+
+plt.show()
