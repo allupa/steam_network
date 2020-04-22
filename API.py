@@ -37,10 +37,10 @@ def main():
     steam_data = []
     counter = 0
     print("Starting to iterate...")
+    api_baseurl = 'http://api.steampowered.com/ISteamUser'
     for i in steamids:
         #steamid = steamids[i]
         #Web API osoitteet, joista voidaan hakea tietoa
-        api_baseurl = 'http://api.steampowered.com/ISteamUser'
         api_getfriends = api_baseurl + '/GetFriendList/v0001/?key={}&steamid={}&relationship=all'.format(api_key, i)
         api_getplayersummaries = api_baseurl + '/GetPlayerSummaries/v0002/?key={}&steamids={}'.format(api_key, i)
         #Haetaan webistä steamID:n käyttäjän kaverit listaan steamIDs
@@ -57,6 +57,21 @@ def main():
             data = r.json()
             persona_name = data['response']['players'][0]['personaname']
             crawl_review_score(persona_name, driver, i)
+            for n in from_to:
+                api_getfriends = api_baseurl + '/GetFriendList/v0001/?key={}&steamid={}&relationship=all'.format(api_key, n)
+                r = requests.get(api_getfriends)
+                data2 = r.json()
+                friend_nodes2 = [s for s in data2['friendslist']['friends']]
+                steamIDs2 = [n['steamid'] for n in friend_nodes2]
+                from_to2 = [n for n in steamIDs2]
+                for node in from_to2:
+                    steam_data.append([int(n), int(node)])
+                r = requests.get(api_getplayersummaries)
+                data = r.json()
+                persona_name = data['response']['players'][0]['personaname']
+                crawl_review_score(persona_name, driver, n)
+
+
 
         except KeyError:
             print("Failed request, KeyError")
