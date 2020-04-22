@@ -8,6 +8,8 @@ import util
 import json
 import csv
 import sys
+from crawler import get_chrome_driver
+from review_score_crawler import crawl_review_score
 
 
 def write_to_node_csv(data):
@@ -19,6 +21,8 @@ def write_to_node_csv(data):
 
 #API-key:n haku ja sijoittaminen
 def main():
+    config = util.load_config()
+    driver = get_chrome_driver(config)
     from_to = []
     steamIDs = []
     myFriends = []
@@ -38,7 +42,7 @@ def main():
         #Web API osoitteet, joista voidaan hakea tietoa
         api_baseurl = 'http://api.steampowered.com/ISteamUser'
         api_getfriends = api_baseurl + '/GetFriendList/v0001/?key={}&steamid={}&relationship=all'.format(api_key, steamid)
-        api_getplayersummaries = api_baseurl + '/GetPlayerSummaries/v0002/?key={}&steamids='.format(api_key)
+        api_getplayersummaries = api_baseurl + '/GetPlayerSummaries/v0002/?key={}&steamids={}'.format(api_key, steamid)
         #Haetaan webistä steamID:n käyttäjän kaverit listaan steamIDs
         print(f'Making request with: {api_getfriends}')
         try:
@@ -46,11 +50,30 @@ def main():
             data = r.json()
             friend_nodes = [s for s in data['friendslist']['friends']]
             steamIDs = [n['steamid'] for n in friend_nodes]
-            print(steamid)
             from_to = [n for n in steamIDs]
             for node in from_to:
                 steam_data.append([int(steamid), int(node)])
-            
+            r = requests.get(api_getplayersummaries)
+            data = r.json()
+            persona_name = data['response']['players'][0]['personaname']
+            crawl_review_score(persona_name, driver, steamid)
+
+        except KeyError:
+            print("Failed request, KeyError")
+            continue
+        # except:
+        #     print("Unexpected error:", sys.exc_info()[0])
+        #     break
+        
+    write_to_node_csv(steam_data)
+    return 0
+
+
+main()
+
+
+
+
             #Haetaan webistä SteamID:tä vastaava username ja lisätään se listaan
             # i = 0
             # for _ in range(2):
@@ -67,15 +90,3 @@ def main():
             # print(f'Appending a steam nick to list... {counter}')
             # steam_data.append([steam_nick_id])
             # counter += 1
-        except KeyError:
-            print("Failed request, KeyError")
-            continue
-        # except:
-        #     print("Unexpected error:", sys.exc_info()[0])
-        #     break
-        
-    write_to_node_csv(steam_data)
-    return 0
-
-
-main()
