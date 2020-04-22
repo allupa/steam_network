@@ -10,9 +10,10 @@ import csv
 import re
 import util
 import json
+from review_score_crawler import crawl_review_score
 
 
-# Remove double spaces, whitespaces and change everything to uppercase from ski data
+# Remove double spaces, whitespaces and change everything to uppercase from profile data
 def clean_ski(l):
     for r in l:
         r = r.strip()
@@ -42,7 +43,7 @@ def write_to_json(data):
     with open('results.json', 'w', encoding='utf-8') as f:
         json.dump(data, f)
 
-
+# Crawls the friends
 def crawl_friends(profile, driver):
     driver.get(f'https://steamcommunity.com/id/{profile}/friends/')
     elements = driver.find_elements_by_class_name("friend_block_v2")
@@ -77,6 +78,7 @@ def main():
     print("Writing to csv...")
     data[steamID64] = crawl_friends(profile_link, driver)
     write_to_json(data)
+    crawl_review_score(profile_link, driver)
     time.sleep(10)
     # Close everything
     driver.quit()
