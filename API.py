@@ -59,20 +59,24 @@ def main():
             crawl_review_score(persona_name, driver, i)
             for n in from_to:
                 api_getfriends2 = api_baseurl + '/GetFriendList/v0001/?key={}&steamid={}&relationship=all'.format(api_key, n)
-                r2 = requests.get(api_getfriends2)
-                data2 = r2.json()
-                print(data2)
-                friend_nodes2 = [s for s in data2['friendslist']['friends']]
-                steamIDs2 = [n['steamid'] for n in friend_nodes2]
-                from_to2 = [n for n in steamIDs2]
-                for node in from_to2:
-                    steam_data.append([int(n), int(node)])
-                r3 = requests.get(api_getplayersummaries)
-                data3 = r3.json()
-                persona_name = data3['response']['players'][0]['personaname']
-                crawl_review_score(persona_name, driver, n)
-
-
+                try:
+                    r2 = requests.get(api_getfriends2)
+                    data2 = r2.json()
+                    num_friends = len(data2['friendslist']['friends'])
+                    print(f'Data2 with {num_friends} friends')
+                    friend_nodes2 = [s for s in data2['friendslist']['friends']]
+                    steamIDs2 = [n['steamid'] for n in friend_nodes2]
+                    from_to2 = [n for n in steamIDs2]
+                    for node in from_to2:
+                        steam_data.append([int(n), int(node)])
+                    r3 = requests.get(api_getplayersummaries)
+                    data3 = r3.json()
+                    persona_name = data3['response']['players'][0]['personaname']
+                    crawl_review_score(persona_name, driver, n)
+                except Exception as e:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    print(exc_type, exc_tb.tb_lineno)
+                    continue
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
