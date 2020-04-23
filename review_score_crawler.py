@@ -17,9 +17,10 @@ def crawl_review_score(profile, driver, steamID64):
     driver.get(f'https://steamcommunity.com/id/{profile}/recommended/')
     src = driver.page_source
     sorry_found = re.search(r'The specified profile could not be found', src)
+    sorry_finnish = re.search(r'Pahoittelumme!', src)
     # Profile not found with id
     try:
-        if(sorry_found == None):
+        if(sorry_found == None and sorry_finnish == None):
             reviews = driver.find_elements_by_xpath("//div[@class='review_box']/div[@class='header']")
             score = 0
             for n in reviews:
