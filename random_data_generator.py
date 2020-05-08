@@ -12,8 +12,8 @@ from collections import Counter
 import pandas as pd
 
 #Crawled data
-#G_crawled = nx.read_edgelist('network.csv')
-#G_crawled.graph['pos'] = nx.spring_layout(G_crawled)
+G_crawled = nx.read_gexf('steam_graph_communities.gexf')
+G_crawled.graph['pos'] = nx.spring_layout(G_crawled)
 
 N = 7070
 p = 0
@@ -42,8 +42,8 @@ def random_BA_network(N, m_0, m):
 
 
 #Creating random network - ER
-#G_ER = random_ER_network(N, avg_k)
-#nx.write_gexf(G_ER, 'random_ER.gexf')
+G_ER = random_ER_network(N, avg_k)
+nx.write_gexf(G_ER, 'random_ER.gexf')
 
 '''
 Arvot tähän alempaan heitetty päästä, tuli ainakin oikean kokoluokan nro of edges (191 040) ja avg degree (54,042) m_0 = 60 ja m = 27 arvoilla
@@ -78,10 +78,12 @@ def infect_node(G, n=1):
         G.nodes[i_0]['Infection time'] = G.graph['t']
     return G
 
-def plot(G, title=None):
+def plot(G, title):
     color = ['r' if G.nodes[node]['Infected'] else 'g' for node in G.nodes()]
     nx.draw(G, pos=G.graph['pos'], node_size=10, node_color=color)
-    if title: plt.title(title)
+    #Jos ei toimi, niin poista nämä kommentit ja tuo pelkkä plt.title(title)
+    #if title: plt.title(title)
+    plt.title(title)
     plt.show()
 
 
@@ -89,13 +91,13 @@ def plot(G, title=None):
 G_ER_inf = infect_node(G_ER, n=2)
 G_BA_inf = infect_node(G_BA, n=2)
 #G_gaussian_inf = infect_node(G_gaussian, n=2)
-#G_crawled_inf = infect_node(G_crawled, n=2)
-'''
+G_crawled_inf = infect_node(G_crawled, n=2)
+
 nx.write_gexf(G_ER_inf, 'random_ER_inf.gexf')
 nx.write_gexf(G_BA_inf, 'random_BA_inf.gexf')
-nx.write_gexf(G_gaussian_inf, 'random_gaussian_inf.gexf')
+#nx.write_gexf(G_gaussian_inf, 'random_gaussian_inf.gexf')
 nx.write_gexf(G_crawled_inf, 'crawled_inf.gexf')
-'''
+
 
 #Infektion loppuvaiheen mallinnus
 def spread(G, p):
@@ -138,7 +140,7 @@ plt.show()
 
 #Monen datasetin keskiarvoa
 counter = Counter()
-for b in range(20):
+for b in range(5):
     counter += spread(G_ER_inf, p=0.05)
 total = sum(counter.values())
 for key in counter:
@@ -167,7 +169,7 @@ plt.show()
 
 #Monen datasetin keskiarvoa
 counter = Counter()
-for b in range(20):
+for b in range(5):
     counter += spread(G_BA_inf, p=0.05)
 total = sum(counter.values())
 for key in counter:
@@ -197,7 +199,7 @@ plt.show()
 
 #Monen datasetin keskiarvoa
 counter = Counter()
-for b in range(20):
+for b in range(5):
     counter += spread(G_gaussian_inf, p=0.05)
 total = sum(counter.values())
 for key in counter:
@@ -213,7 +215,7 @@ plt.show()
 
 '''
 Crawled network spreading
-
+'''
 
 it_counter = spread(G_crawled_inf, p=0.05)
 plot(G_crawled_inf, title='Crawled network Infection')
@@ -229,7 +231,7 @@ plt.show()
 
 #Monen datasetin keskiarvoa
 counter = Counter()
-for b in range(20):
+for b in range(5):
     counter += spread(G_crawled_inf, p=0.05)
 total = sum(counter.values())
 for key in counter:
@@ -241,4 +243,3 @@ plt.xlabel(r'$t$', fontsize=16)
 plt.ylabel(r'$I(t)$', fontsize=16)
 
 plt.show()
-'''
