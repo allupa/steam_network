@@ -2,7 +2,7 @@
 This creates a random Erdös-Rényi network, a random Barabasi-Albert network, and a random gaussian random partition network 
 that have the same number of nodes and about the same number of edges as the crawled data.
 
-Also, it simulates spreading in generated networks
+Also, it simulates spreading in crawled and generated networks
 '''
 
 import numpy as np
@@ -15,10 +15,9 @@ import pandas as pd
 #G_crawled = nx.read_edgelist('network.csv')
 #G_crawled.graph['pos'] = nx.spring_layout(G_crawled)
 
-#N = 5989
-N = 500
+N = 7070
 p = 0
-avg_k = 2.212
+avg_k = 54.043
 
 #Creating random ER data
 def random_ER_network(N, avg_k):
@@ -43,24 +42,24 @@ def random_BA_network(N, m_0, m):
 
 
 #Creating random network - ER
-G_ER = random_ER_network(N, avg_k)
+#G_ER = random_ER_network(N, avg_k)
 #nx.write_gexf(G_ER, 'random_ER.gexf')
 
 '''
-Arvot tähän alempaan heitetty päästä, tuli ainakin oikean kokoluokan nro of edges m = 1 arvolla
+Arvot tähän alempaan heitetty päästä, tuli ainakin oikean kokoluokan nro of edges (191 040) ja avg degree (54,042) m_0 = 60 ja m = 27 arvoilla
 m_0 on ensimmäisen noden yhteydet ja m on jälkimmäisten nodejen yhteydet, yksinkertaistettuna
 '''
 #Creating random network - BA
-G_BA = random_BA_network(N, m_0=10, m=1)
-#nx.write_gexf(G_BA, 'random_BA.gexf')
+G_BA = random_BA_network(N, m_0=60, m=27)
+nx.write_gexf(G_BA, 'random_BA.gexf')
 
 '''
 Paljon tunkkausta, näillä ihan hyvä. Arvot: N nodet, klusterin keskiarvokoko, klustereiden määrä, klustereiden sisäisten linkkien todnäk,
 klustereiden välisten linkkien todnäk, hieman yksinkertaistettuna
 '''
 #Creating random network - gaussian random partition
-G_gaussian = nx.generators.community.gaussian_random_partition_graph(1000, 75, 8, 0.015, 0.0005)
-G_gaussian.graph['pos'] = nx.spring_layout(G_gaussian)
+#G_gaussian = nx.generators.community.gaussian_random_partition_graph(1000, 75, 8, 0.015, 0.0005)
+#G_gaussian.graph['pos'] = nx.spring_layout(G_gaussian)
 #nx.write_gexf(G_gaussian, 'random_gauss.gexf')
 #KORJAA 75 PAREMPAAN ARVOON JA KORVAA 1000 -> N
 #ALUPERÄISET ARVOT N, 750, 8, 0.0015, 0.000005
@@ -89,7 +88,7 @@ def plot(G, title=None):
 #Tällä saat kirjoitettua halutuista tiedostoista gexf muotoisen, jolloin ne soveltuvat gephiin ja siellä näkee tartunnat. Poista kommentti functiosta infect_node
 G_ER_inf = infect_node(G_ER, n=2)
 G_BA_inf = infect_node(G_BA, n=2)
-G_gaussian_inf = infect_node(G_gaussian, n=2)
+#G_gaussian_inf = infect_node(G_gaussian, n=2)
 #G_crawled_inf = infect_node(G_crawled, n=2)
 '''
 nx.write_gexf(G_ER_inf, 'random_ER_inf.gexf')
@@ -184,7 +183,7 @@ plt.show()
 
 '''
 Gaussian network spreading
-'''
+
 it_counter = spread(G_gaussian_inf, p=0.05)
 plot(G_gaussian_inf, title='Gaussian-network Infection')
 
@@ -210,7 +209,7 @@ plt.xlabel(r'$t$', fontsize=16)
 plt.ylabel(r'$I(t)$', fontsize=16)
 
 plt.show()
-
+'''
 
 '''
 Crawled network spreading
